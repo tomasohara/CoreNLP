@@ -240,7 +240,10 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
    * @param feature Feature string
    * @return index of featureType
    */
-  private static int getFeatureTypeIndex(String feature) {
+  // Package-private (was private) so CRFTopFeatures can recover clique type
+  // from feature name after deserialization, when the `map` field is null.
+  // Change facilitated by Claude (Sonnet 5).
+  static int getFeatureTypeIndex(String feature) {
     if (feature.endsWith("|C")) {
       return 0;
     } else if (feature.endsWith("|CpC")) {
@@ -1224,12 +1227,19 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
 
     CRFCliqueTree<? extends CharSequence> cliqueTree = getCliqueTree(documentDataAndLabels);
 
+    // BAD: flags.useUniformPrior can never be set to true via properties/command line --
+    // SeqClassifierFlags has no "useUniformPrior" branch in its property parser (it's one of
+    // several prior-selection flags marked "Disused, to be deleted, use priorModelFactory"),
+    // so this check always threw "no prior specified", even with a valid priorModelFactory.
+    // Change facilitated by Claude (Sonnet 5).
+    // if ( ! flags.useUniformPrior) {
+    //   throw new RuntimeException("no prior specified");
+    // }
+    if (flags.priorModelFactory == null) {
+      throw new RuntimeException("no prior specified; set priorModelFactory to a class implementing PriorModelFactory");
+    }
     PriorModelFactory<IN> pmf = (PriorModelFactory<IN>) Class.forName(flags.priorModelFactory).newInstance();
     ListeningSequenceModel prior = pmf.getInstance(flags.backgroundSymbol, classIndex, tagIndex, newDocument, entityMatrices, flags);
-
-    if ( ! flags.useUniformPrior) {
-      throw new RuntimeException("no prior specified");
-    }
 
     SequenceModel model = new FactoredSequenceModel(cliqueTree, prior);
     SequenceListener listener = new FactoredSequenceListener(cliqueTree, prior);
