@@ -51,6 +51,8 @@ public class ColumnDocumentReaderAndWriter implements DocumentReaderAndWriter<Co
 
 
   public void init(String map) {
+    // OLD: System.err.println("ColumnDocumentReaderAndWriter.init: map=" + map);
+    log.debug("ColumnDocumentReaderAndWriter.init: map=" + map);
     // this.flags = null;
     this.map = CoreLabel.parseStringKeys(StringUtils.mapStringToArray(map));
     this.wordColumn = ArrayUtils.indexOf(this.map, CoreAnnotations.TextAnnotation.class);
@@ -76,6 +78,9 @@ public class ColumnDocumentReaderAndWriter implements DocumentReaderAndWriter<Co
     public List<CoreLabel> apply(String doc) {
       // if (num > 0 && num % 1000 == 0) { log.info("["+num+"]"); } // cdm: Not so useful to do in new logging world
       // num++;
+      // DEBUG:
+      // OLD: System.err.println("ColumnDocumentReaderAndWriter.apply()");
+      log.debug("ColumnDocumentReaderAndWriter.apply()");
 
       List<CoreLabel> words = new ArrayList<>();
       String[] lines = doc.split("\n");
