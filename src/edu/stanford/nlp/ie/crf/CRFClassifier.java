@@ -240,9 +240,10 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
    * @param feature Feature string
    * @return index of featureType
    */
-  // Package-private (was private) so CRFTopFeatures can recover clique type
+  // note: Package-private so CRFTopFeatures can recover clique type
   // from feature name after deserialization, when the `map` field is null.
   // Change facilitated by Claude (Sonnet 5).
+  // OLD: private static int getFeatureTypeIndex(String feature) {
   static int getFeatureTypeIndex(String feature) {
     if (feature.endsWith("|C")) {
       return 0;
@@ -663,7 +664,11 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
         enc = "UTF-8";
       }
 
-      PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream("features-" + flags.printFeatures
+      // OLD:
+      // PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream("features-" + flags.printFeatures
+      //     + ".txt"), enc), true);
+      // NOTE: renamed to avoid conflict w/ AbstractSequenceClassifier.printFeatures output file
+      PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream("CRF-features-" + flags.printFeatures
           + ".txt"), enc), true);
       for (String feat : featureIndex) {
         pw.println(feat);
@@ -1061,6 +1066,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
 
   @Override
   public List<IN> classify(List<IN> document) {
+    log.debug("in classify/1");
     if (flags.doGibbs) {
       try {
         return classifyGibbs(document);
@@ -1075,6 +1081,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
   }
 
   private List<IN> classify(List<IN> document, Triple<int[][][], int[], double[][][]> documentDataAndLabels) {
+    log.info("in classify/2");
     if (flags.doGibbs) {
       try {
         return classifyGibbs(document, documentDataAndLabels);
@@ -1154,6 +1161,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
    * @return The classified document
    */
   public List<IN> classifyMaxEnt(List<IN> document) {
+    log.debug("in classifyMaxEnt/1");
     if (document.isEmpty()) {
       return document;
     }
@@ -1163,6 +1171,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
   }
 
   private List<IN> classifyMaxEnt(List<IN> document, Triple<int[][][], int[], double[][][]> documentDataAndLabels) {
+    log.debug("in classifyMaxEnt/2");
     if (document.isEmpty()) {
       return document;
     }
@@ -1210,6 +1219,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
   public List<IN> classifyGibbs(List<IN> document) throws ClassNotFoundException, SecurityException,
       NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException,
       InvocationTargetException {
+    log.debug("in classifyGibbs/1");
     Triple<int[][][], int[], double[][][]> p = documentToDataAndLabels(document);
     return classifyGibbs(document, p);
   }
@@ -1217,6 +1227,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
   public List<IN> classifyGibbs(List<IN> document, Triple<int[][][], int[], double[][][]> documentDataAndLabels)
       throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException,
       InstantiationException, IllegalAccessException, InvocationTargetException {
+    log.debug("in classifyGibbs/2");
     // log.info("Testing using Gibbs sampling.");
     List<IN> newDocument = document; // reversed if necessary
     if (flags.useReverse) {
@@ -2963,6 +2974,8 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
 
   /** The main method. See the class documentation. */
   public static void main(String[] args) throws Exception {
+    // OLD: System.err.println("CRFClassifier.main");
+    log.debug("CRFClassifier.main");
     StringUtils.logInvocationString(log, args);
 
     Properties props = StringUtils.argsToProperties(args, SeqClassifierFlags.flagsToNumArgs());
