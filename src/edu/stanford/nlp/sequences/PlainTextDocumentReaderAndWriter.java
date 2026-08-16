@@ -93,6 +93,8 @@ public class PlainTextDocumentReaderAndWriter<IN extends CoreMap> implements Doc
    * using the constructor.
    */
   public PlainTextDocumentReaderAndWriter() {
+    // OLD: System.err.println("PlainTextDocumentReaderAndWriter()");
+    log.debug("PlainTextDocumentReaderAndWriter()");
   }
 
   @Override
