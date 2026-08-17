@@ -2975,7 +2975,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
   /** The main method. See the class documentation. */
   public static void main(String[] args) throws Exception {
     // OLD: System.err.println("CRFClassifier.main");
-    log.debug("CRFClassifier.main");
+    log.debug("in CRFClassifier.main");
     StringUtils.logInvocationString(log, args);
 
     Properties props = StringUtils.argsToProperties(args, SeqClassifierFlags.flagsToNumArgs());
