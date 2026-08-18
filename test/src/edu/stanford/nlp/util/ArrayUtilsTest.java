@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * @author Christopher Manning
@@ -94,4 +94,54 @@ public class ArrayUtilsTest {
     assertEquals(5, ArrayUtils.getSubListIndex(t7, t8).get(1).intValue());
   }
 
+  @Test
+  public void testToString() {
+      // Make sure the primitive overloads and the generic method all work.
+      final String EXPECTED_INT_MATRIX_STR = "[[1, 2, 3],[4, 5, 6],[7, 8, 9]]";
+      final String EXPECTED_DOUBLE_MATRIX_STR = "[[1.1, 2.1, 3.1],[4.1, 5.1, 6.1],[7.1, 8.1, 9.1]]";
+      int[][] int_matrix = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+      final int size = 3;
+
+      // Guard against a bad revision where int_matrix's actual dimensions
+      // drift from size (e.g., someone edits the literal but not size, or
+      // vice versa), which would silently invalidate the assertions below.
+      int expected_int_bytes = size * size * Integer.BYTES;
+      int actual_int_bytes = int_matrix.length * int_matrix[0].length * Integer.BYTES;
+      assertEquals(expected_int_bytes, actual_int_bytes);
+
+      // Separately confirm the row count itself is size: the byte check above
+      // is a product, so it alone wouldn't catch a non-square drift (e.g., 1x9 vs 3x3).
+      // Note that EXPECTED_INT_MATRIX_STR, etc. implicitly assumes this exact size.
+      assertEquals(size, int_matrix.length);
+
+      // Derive other matrices from the integer one
+      double[][] double_matrix = new double[size][size];
+      double[][] doubled_int_matrix = new double[size][size];
+      Integer[][] boxed_int_matrix = new Integer[size][size];
+      Double[][] boxed_double_matrix = new Double[size][size];
+      for (int r = 0; r < size; r++) {
+	  for (int c = 0; c < size; c++) {
+	      doubled_int_matrix[r][c] = int_matrix[r][c];
+	      double_matrix[r][c] = int_matrix[r][c] + 0.1;
+	      boxed_int_matrix[r][c] = int_matrix[r][c];
+	      boxed_double_matrix[r][c] = double_matrix[r][c];
+	  }
+      }
+
+      // Check the primtive versions
+      assertEquals(EXPECTED_INT_MATRIX_STR,
+		   ArrayUtils.toString(int_matrix));
+      assertNotEquals(EXPECTED_INT_MATRIX_STR,
+		      ArrayUtils.toString(doubled_int_matrix));
+      assertEquals(EXPECTED_DOUBLE_MATRIX_STR.replace(".1", ".0"),
+		   ArrayUtils.toString(doubled_int_matrix));
+      assertEquals(EXPECTED_DOUBLE_MATRIX_STR,
+		   ArrayUtils.toString(double_matrix));
+
+      // Exercise the generic <T> toString(T[][]) overload with reference-type arrays.
+      assertEquals(EXPECTED_INT_MATRIX_STR,
+		   ArrayUtils.toString(boxed_int_matrix));
+      assertEquals(EXPECTED_DOUBLE_MATRIX_STR,
+		   ArrayUtils.toString(boxed_double_matrix));
+  }
 }
