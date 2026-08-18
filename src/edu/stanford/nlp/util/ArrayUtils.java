@@ -462,7 +462,20 @@ public class ArrayUtils  {
     return retVal;
   }
 
+  public static <T> String toString(T[][] a) {
+    // note: currently just used in the tests
+    StringBuilder result = new StringBuilder("[");
+    for (int i = 0; i < a.length; i++) {
+      result.append(Arrays.toString(a[i]));
+      if(i < a.length-1)
+        result.append(',');
+      }
+    result.append(']');
+    return result.toString();
+  }
+
   public static String toString(int[][] a) {
+    // note: required due to generics limitation with primitives types
     StringBuilder result = new StringBuilder("[");
     for (int i = 0; i < a.length; i++) {
       result.append(Arrays.toString(a[i]));
@@ -778,6 +791,7 @@ public class ArrayUtils  {
   }
 
   public static String toString(double[][] b) {
+    // note: required due to generics limitation with primitives types
     StringBuilder result = new StringBuilder("[");
     for (int i = 0; i < b.length; i++) {
       result.append(Arrays.toString(b[i]));
@@ -789,6 +803,7 @@ public class ArrayUtils  {
   }
 
   public static String toString(boolean[][] b) {
+    // note: required due to generics limitation with primitives types
     StringBuilder result = new StringBuilder("[");
     for (int i = 0; i < b.length; i++) {
       result.append(Arrays.toString(b[i]));
